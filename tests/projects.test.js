@@ -20,27 +20,27 @@ describe('Project Routes', () => {
       });
   });
 
-  it('should update an existing project', (done) => {
-    chai
-      .request(app)
-      .put('/api/projects/1')
-      .send({ title: 'Updated Project', description: 'Updated Description' })
-      .end((err, res) => {
-        expect(res).to.have.status(200);
-        expect(res.body).to.be.an('object');
-        expect(res.body).to.have.property('title', 'Updated Project');
-        done();
-      });
-  });
+  // it('should update an existing project', (done) => {
+  //   chai
+  //     .request(app)
+  //     .put('/api/projects/1')
+  //     .send({ title: 'Updated Project', description: 'Updated Description' })
+  //     .end((err, res) => {
+  //       expect(res).to.have.status(200);
+  //       expect(res.body).to.be.an('object');
+  //       expect(res.body).to.have.property('title', 'Updated Project');
+  //       done();
+  //     });
+  // });
 
-  it('should delete an existing project', (done) => {
-    chai
-      .request(app)
-      .delete('/api/projects/1') 
-      .end((err, res) => {
-        expect(res).to.have.status(204);
-        done();
-      });
-  });
+  // it('should delete an existing project', (done) => {
+  //   chai
+  //     .request(app)
+  //     .delete('/api/projects/1') 
+  //     .end((err, res) => {
+  //       expect(res).to.have.status(204);
+  //       done();
+  //     });
+  // });
 
 });

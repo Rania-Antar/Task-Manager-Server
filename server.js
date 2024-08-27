@@ -2,10 +2,10 @@ const express = require("express");
 const passport = require('passport');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 const { validationResult, check } = require('express-validator');
 const db = require("./models");
-const secretKey = "E3#fd&jKs^2P$lmnGhT4*qR@W5tYzXv";
-
+const secretKey = crypto.randomBytes(64).toString('hex');
 const userRoute = require("./routes/user");
 const projectRoute = require("./routes/project");
 const taskRoute = require("./routes/task");

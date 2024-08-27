@@ -6,7 +6,7 @@ const {User} = require('../models');
 const { check, validationResult } = require('express-validator');
 
 
-router.post('/projects//:projectId', [
+router.post('/projects/:projectId/:userId', [
     check('title').notEmpty().withMessage('Title is required').trim(),
     check('description').optional().trim(),
 ], async (req, res) => {
@@ -17,14 +17,41 @@ router.post('/projects//:projectId', [
     }
 
     const projectId = req.params.projectId;
+    const userId = req.params.userId;
+
     try {
-        const { title, description } = req.body;
+        const { title, description, priority } = req.body;
         const project = await Project.findByPk(projectId);
         if (!project) {
             return res.status(404).json({ message: 'Project not found.' });
         }
-        const task = await Task.create({ title, description });
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        const task = await Task.create({ title, description , status : 'incomplete' , priority });
         await project.addTask(task);
+        await user.addTask(task);
+        res.status(201).json(task);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error creating task.' });
+    }
+});
+
+router.post('/', [
+    check('title').notEmpty().trim(),
+    check('description').optional().trim(),
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
+        const { title, description } = req.body;
+        const task = await Task.create({ title, description, status : 'incomplete' , priority: 'medium'  });
         res.status(201).json(task);
     } catch (error) {
         console.error(error);
@@ -40,6 +67,16 @@ router.get('/projects/:projectId/tasks', async (req, res) => {
             return res.status(404).json({ message: 'Project not found.' });
         }
         const tasks = project.Tasks;
+        res.json(tasks);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching tasks.' });
+    }
+});
+
+router.get('/', async (req, res) => {
+    try {
+        const tasks = await Task.findAll();
         res.json(tasks);
     } catch (error) {
         console.error(error);

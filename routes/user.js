@@ -1,8 +1,9 @@
 const express = require('express');
 const passport = require('passport');
+const bcrypt = require('bcrypt');
 const { generateToken, verifyToken } = require('../middlewares/jwt-middleware');
 const { check, validationResult } = require('express-validator');
-const User = require('../models/User');
+const {User} = require('../models');
 const router = express.Router();
 
 router.post('/register', [
@@ -39,13 +40,28 @@ router.post('/login', (req, res, next) => {
         return next(err);
       }
       const token = generateToken(user);
-      return res.json({ token });
+      return res.json({ user, token });
     });
   })(req, res, next);
 });
 
 router.get('/protected', verifyToken, (req, res) => {
   res.json({ message: 'You have access to this protected route!', user: req.user });
+});
+
+router.delete('/:id', async (req, res) => {
+  const userId = req.params.id;
+  try {
+      const user = await User.findByPk(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found.' });
+      }
+      await user.destroy();
+      res.status(204).send();
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error deleting User.' });
+  }
 });
 
 module.exports = router;
